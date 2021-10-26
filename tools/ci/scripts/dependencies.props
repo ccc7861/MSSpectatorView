@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="dependencies.user.props" Condition="Exists('dependencies.user.props')"/>
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <!-- From: https://www.blackmagicdesign.com/support -->
+    <DeckLink_inc>$(SolutionDir)\..\..\external\dependencies\Blackmagic DeckLink SDK 10.9.11\Win\include</DeckLink_inc>
+    <!-- From: https://github.com/elgatosf/gamecapture -->
+    <Elgato_Filter>$(SolutionDir)\..\..\external\gamecapture\VideoCaptureFilter</Elgato_Filter>
+    
+    <!-- From: https://docs.microsoft.com/en-us/azure/kinect-dk/sensor-sdk-download -->
+    <AzureKinectSDK>$(SolutionDir)\..\..\external\dependencies\Azure Kinect SDK v1.3.0</AzureKinectSDK>
+
+    <!-- From: https://docs.microsoft.com/en-us/azure/kinect-dk/body-sdk-download -->
+    <AzureKinectBodyTrackingSDK>$(SolutionDir)\..\..\external\dependencies\Azure Kinect Body Tracking SDK</AzureKinectBodyTrackingSDK>
+    
+    <AzureKinectIncludeDirectory>$(AzureKinectSDK)\sdk\include</AzureKinectIncludeDirectory>
+    <AzureKinectLibraryDirectory>$(AzureKinectSDK)\sdk\windows-desktop\amd64\release\lib</AzureKinectLibraryDirectory>
+    <AzureKinectBodyTrackingIncludeDirectory>$(AzureKinectBodyTrackingSDK)\sdk\include</AzureKinectBodyTrackingIncludeDirectory>
+    <AzureKinectBodyTrackingLibraryDirectory>$(AzureKinectBodyTrackingSDK)\sdk\windows-desktop\amd64\release\lib</AzureKinectBodyTrackingLibraryDirectory>
+
+    <AdditionalAzureLibraries Condition="Exists('$(AzureKinectSDK)')">k4a.lib</AdditionalAzureLibraries>
+    <AdditionalAzureBodyTrackingLibraries Condition="Exists('$(AzureKinectBodyTrackingSDK)')">k4abt.lib</AdditionalAzureBodyTrackingLibraries>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile Condition="Exists('$(DeckLink_inc)')">
+      <PreprocessorDefinitions>INCLUDE_BLACKMAGIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Condition="Exists('$(Elgato_Filter)')">
+      <PreprocessorDefinitions>INCLUDE_ELGATO;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Condition="Exists('$(AzureKinectSDK)')">
+      <PreprocessorDefinitions>INCLUDE_AZUREKINECT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Condition="Exists('$(AzureKinectBodyTrackingSDK)')">
+      <PreprocessorDefinitions>INCLUDE_AZUREKINECT_BODYTRACKING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Target Name="TestForElgatoAndBlackmagic" BeforeTargets="PrepareForBuild">
+    <Error Condition="!Exists('$(DeckLink_inc)') And !Exists('$(Elgato_Filter)') And !Exists('$(AzureKinectSDK)')" Text="No capture card dependencies exist for the paths defined in dependencies.props. At least one dependency must resolve to build this project."/>
+  </Target>
+</Project>
+
+<!--
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+-->
